@@ -9,7 +9,6 @@ terraform {
 
 provider "azurerm" {
   features {}
-  resource_provider_registrations = "none"
 }
 
 resource "azurerm_resource_group" "vnet" {
@@ -64,8 +63,8 @@ resource "azurerm_kubernetes_cluster" "aks" {
   }
 
   network_profile {
-    network_plugin     = "azure"
-    service_cidr       = var.network_service_cidr
-    dns_service_ip     = var.network_dns_service_ip
+    network_plugin = "azure"
+    service_cidr   = var.network_service_cidr
+    dns_service_ip = var.network_dns_service_ip
   }
 }
