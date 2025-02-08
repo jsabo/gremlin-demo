@@ -1,0 +1,40 @@
+# WordPress settings
+wordpress:
+  wordpressUsername: admin
+  wordpressPassword: "password123"    # Change to a secure password
+  wordpressEmail: admin@sabo.gremlin.rocks
+  wordpressBlogName: "Gremlin Rocks"
+
+# Enable and configure the in-cluster MariaDB (default)
+mariadb:
+  enabled: true
+  auth:
+    rootPassword: "password123"       # Change as needed
+    password: "password123"           # Change as needed
+    username: "wordpress"
+    database: "wordpress"
+
+# Enable memcached for caching (using Bitnami memcached subchart)
+memcached:
+  enabled: true
+  auth:
+    enabled: false
+
+# Persistence for WordPress data (adjust size and storageClass as required)
+persistence:
+  enabled: false
+  size: 10Gi
+
+# Change service type to ClusterIP
+service:
+  type: ClusterIP
+
+# Enable and configure Ingress
+ingress:
+  enabled: true
+  hostname: "wordpress-prod.sabo.gremlin.rocks"
+  path: /
+  pathType: ImplementationSpecific
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+  tls: false

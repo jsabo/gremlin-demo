@@ -126,6 +126,35 @@ module "eks" {
       tags = local.tags
     }
 
+    gpe = {
+      name           = "sabodotio-gpe"
+      instance_types = ["r7i.xlarge"]
+      ami_type       = "${local.ami_type}"
+
+      min_size     = 3
+      max_size     = 3
+      desired_size = 3
+
+      attach_cluster_primary_security_group = true
+      disk_size = 100
+
+      key_name = local.key_name
+
+      iam_role_additional_policies = {
+        AmazonEBSCSIDriverPolicy = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy",
+        additional               = aws_iam_policy.additional.arn
+      }
+
+      pre_bootstrap_user_data = <<-EOT
+        yum install -y amazon-ssm-agent kernel-devel-`uname -r` iproute-tc
+        yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm -y
+        curl -o /etc/yum.repos.d/jdoss-wireguard-epel-7.repo https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo
+        yum install wireguard-dkms wireguard-tools -y
+        systemctl enable amazon-ssm-agent && systemctl start amazon-ssm-agent
+      EOT
+
+      tags = local.tags
+    }
   }
 
   fargate_profile_defaults = {

@@ -93,12 +93,7 @@ module "eks_blueprints_addons" {
 
   eks_addons = {
     aws-ebs-csi-driver = {
-      most_recent          = true
-      configuration_values = jsonencode({
-        defaultStorageClass = {
-          enabled = true
-        }
-      })
+      most_recent = true
     }
   }
 
@@ -118,7 +113,7 @@ module "eks_blueprints_addons" {
     name       = "aws-load-balancer-controller"
     chart      = "aws-load-balancer-controller"
     repository = "https://aws.github.io/eks-charts"
-    version    = "1.11.0"
+    version    = "1.4.8"
     namespace  = "kube-system"
     values = [templatefile("${path.module}/helm_values/values-aws-load-balancer-controller.yaml", {
       clusterName                        = "${local.cluster_name}"
@@ -154,32 +149,17 @@ resource "helm_release" "gremlin" {
   })]
 }
 
-resource "helm_release" "wordpress_sabodotio_dev" {
-  name             = "wordpress"
-  repository       = "oci://registry-1.docker.io/bitnamicharts"
-  chart            = "wordpress"
-  version          = "24.1.9"
-  namespace        = "wordpress-sabodotio-dev"
+resource "helm_release" "opentelemetry-demo" {
+  name             = "otel-demo"
+  chart            = "opentelemetry-demo"
+  repository       = "https://open-telemetry.github.io/opentelemetry-helm-charts"
+  version          = local.otel_demo_chart_version
+  namespace        = "otel-demo"
   create_namespace = true
-  values = [templatefile("${path.module}/helm_values/values-wordpress-sabodotio-dev.yaml", {})]
-}
-
-resource "helm_release" "wordpress_sabodotio_test" {
-  name             = "wordpress"
-  repository       = "oci://registry-1.docker.io/bitnamicharts"
-  chart            = "wordpress"
-  version          = "24.1.9"
-  namespace        = "wordpress-sabodotio-test"
-  create_namespace = true
-  values = [templatefile("${path.module}/helm_values/values-wordpress-sabodotio-test.yaml", {})]
-}
-
-resource "helm_release" "wordpress_sabodotio_prod" {
-  name             = "wordpress"
-  repository       = "oci://registry-1.docker.io/bitnamicharts"
-  chart            = "wordpress"
-  version          = "24.1.9"
-  namespace        = "wordpress-sabodotio-prod"
-  create_namespace = true
-  values = [templatefile("${path.module}/helm_values/values-wordpress-sabodotio-prod.yaml", {})]
+  values = [templatefile("${path.module}/helm_values/values-opentelemetry-demo.yaml", {
+    gremlin_team_id    = local.cluster_name
+    datadog_api_key    = local.datadog_api_key
+    datadog_site       = local.datadog_site
+    gremlin_cluster_id = local.cluster_name
+  })]
 }
