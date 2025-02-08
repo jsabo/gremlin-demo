@@ -51,6 +51,8 @@ locals {
   gremlin_team_id                    = var.gremlin_team_id
   gremlin_team_secret                = var.gremlin_team_secret
   gremlin_chart_version              = var.gremlin_chart_version
+  wordpress_password                 = var.wordpress_password
+  wordpress_db_password              = var.wordpress_db_password
   otel_demo_chart_version            = var.otel_demo_chart_version
   datadog_api_key                    = var.datadog_api_key
   datadog_site                       = var.datadog_site
@@ -93,7 +95,7 @@ module "eks_blueprints_addons" {
 
   eks_addons = {
     aws-ebs-csi-driver = {
-      most_recent          = true
+      most_recent = true
       configuration_values = jsonencode({
         defaultStorageClass = {
           enabled = true
@@ -161,7 +163,10 @@ resource "helm_release" "wordpress_sabodotio_dev" {
   version          = "24.1.9"
   namespace        = "wordpress-sabodotio-dev"
   create_namespace = true
-  values = [templatefile("${path.module}/helm_values/values-wordpress-sabodotio-dev.yaml", {})]
+  values = [templatefile("${path.module}/helm_values/values-wordpress-sabodotio-dev.yaml", {
+    wordpress_password    = local.wordpress_password
+    wordpress_db_password = local.wordpress_db_password
+  })]
 }
 
 resource "helm_release" "wordpress_sabodotio_test" {
@@ -171,7 +176,10 @@ resource "helm_release" "wordpress_sabodotio_test" {
   version          = "24.1.9"
   namespace        = "wordpress-sabodotio-test"
   create_namespace = true
-  values = [templatefile("${path.module}/helm_values/values-wordpress-sabodotio-test.yaml", {})]
+  values = [templatefile("${path.module}/helm_values/values-wordpress-sabodotio-test.yaml", {
+    wordpress_password    = local.wordpress_password
+    wordpress_db_password = local.wordpress_db_password
+  })]
 }
 
 resource "helm_release" "wordpress_sabodotio_prod" {
@@ -181,5 +189,8 @@ resource "helm_release" "wordpress_sabodotio_prod" {
   version          = "24.1.9"
   namespace        = "wordpress-sabodotio-prod"
   create_namespace = true
-  values = [templatefile("${path.module}/helm_values/values-wordpress-sabodotio-prod.yaml", {})]
+  values = [templatefile("${path.module}/helm_values/values-wordpress-sabodotio-prod.yaml", {
+    wordpress_password    = local.wordpress_password
+    wordpress_db_password = local.wordpress_db_password
+  })]
 }

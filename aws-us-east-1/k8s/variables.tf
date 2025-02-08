@@ -52,3 +52,20 @@ variable "datadog_site" {
   default     = "datadoghq.com"
 }
 
+variable "wordpress_password" {
+  description = <<-DESC
+    (Required) Password for Wordpress admin account.
+    Use the environment variable TF_VAR_wordpress_password if you prefer not to hard-code this value.
+  DESC
+  type        = string
+  sensitive   = true
+}
+
+variable "wordpress_db_password" {
+  description = <<-DESC
+    (Required) Password for Wordpress database access.
+    Use the environment variable TF_VAR_wordpress_db_password if you prefer not to hard-code this value.
+  DESC
+  type        = string
+  sensitive   = true
+}

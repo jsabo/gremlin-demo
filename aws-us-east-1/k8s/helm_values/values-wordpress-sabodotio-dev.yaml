@@ -1,7 +1,7 @@
 # WordPress settings
 wordpress:
   wordpressUsername: admin
-  wordpressPassword: "password123"     # Change to a secure password
+  wordpressPassword: '${wordpress_password}'
   wordpressEmail: admin@sabo.gremlin.rocks
   wordpressBlogName: "Gremlin Rocks"
 
@@ -9,8 +9,8 @@ wordpress:
 mariadb:
   enabled: true
   auth:
-    rootPassword: "password123"        # Change as needed
-    password: "password123"            # Change as needed
+    rootPassword: '${wordpress_db_password}'
+    password: '${wordpress_db_password}'
     username: "wordpress"
     database: "wordpress"
 
