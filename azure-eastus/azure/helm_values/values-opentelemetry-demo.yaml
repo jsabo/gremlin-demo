@@ -8,30 +8,43 @@ opentelemetry-collector:
       memory: "1Gi"
       cpu: "500m"
   config:
+    receivers:
+      redis:
+        endpoint: "otel-demo-valkey:6379"
     exporters:
-      otlp/honeycomb:
-        endpoint: "api.honeycomb.io:443"
-        headers:
-          "x-honeycomb-team": "${honeycomb_storefront_api_key}"
-          "x-honeycomb-dataset": "storefront-metrics"
+      datadog:
+        traces:
+          span_name_as_resource_name: true
+          trace_buffer: 500
+        hostname: "otelcol-helm"
+        api:
+          site: '${datadog_site}'
+          key: '${datadog_api_key}'
+
+    processors:
+      resource:
+        attributes:
+          - key: deployment.environment
+            value: "${gremlin_cluster_id}"
+            action: upsert
+
+    connectors:
+      datadog/connector:
+        traces:
+          span_name_as_resource_name: true
+
     service:
       pipelines:
         traces:
-          exporters:
-            - otlp
-            - debug
-            - spanmetrics
-            - otlp/honeycomb
+          processors: [resource, batch]
+          exporters: [otlp, debug, spanmetrics, datadog, datadog/connector]
         metrics:
-          exporters:
-            - otlphttp/prometheus
-            - debug
-            - otlp/honeycomb
+          receivers: [httpcheck/frontendproxy, otlp, redis, spanmetrics, datadog/connector]
+          processors: [resource, batch]
+          exporters: [otlphttp/prometheus, debug, datadog]
         logs:
-          exporters:
-            - opensearch
-            - debug
-            - otlp/honeycomb
+          processors: [resource, batch]
+          exporters: [opensearch, debug, datadog]
 
 prometheus:
   enabled: true
@@ -171,9 +184,8 @@ components:
         alb.ingress.kubernetes.io/target-type: ip
         alb.ingress.kubernetes.io/target-node-labels: kubernetes.io/os=linux
         alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
-        alb.ingress.kubernetes.io/rule-type: host
       hosts:
-        - host: "storefront.gremlin.rocks"
+        - host: ""
           paths:
             - path: /
               pathType: Prefix

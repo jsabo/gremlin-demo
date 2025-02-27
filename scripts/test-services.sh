@@ -1,15 +1,21 @@
 #!/bin/bash
 
+# Check if a team ID was provided as an argument; otherwise, use the GREMLIN_TEAM_ID environment variable.
+if [ -n "$1" ]; then
+  TEAM_ID="$1"
+else
+  TEAM_ID="${GREMLIN_TEAM_ID:?Environment variable GREMLIN_TEAM_ID not set and no team ID argument provided.}"
+fi
+
 # Ensure required environment variables are set
-GREMLIN_TEAM_ID=${GREMLIN_TEAM_ID:?Environment variable GREMLIN_TEAM_ID not set}
-GREMLIN_API_KEY=${GREMLIN_API_KEY:?Environment variable GREMLIN_API_KEY not set}
+: "${GREMLIN_API_KEY:?Environment variable GREMLIN_API_KEY not set}"
 BASE_URL="https://api.gremlin.com/v1"
 
 # Fetch the list of RM services
-echo "Fetching list of RM services for team $GREMLIN_TEAM_ID..."
+echo "Fetching list of RM services for team $TEAM_ID..."
 response=$(curl -s -X GET \
   -H "Authorization: Key $GREMLIN_API_KEY" \
-  "$BASE_URL/services?teamId=$GREMLIN_TEAM_ID")
+  "$BASE_URL/services?teamId=$TEAM_ID")
 
 # Check if the response is valid JSON
 if ! echo "$response" | jq empty 2>/dev/null; then
@@ -20,7 +26,7 @@ fi
 # Parse and display the RM services
 services=$(echo "$response" | jq -c '.items[]')
 if [[ -z "$services" ]]; then
-  echo "No RM services found for team $GREMLIN_TEAM_ID."
+  echo "No RM services found for team $TEAM_ID."
   exit 1
 fi
 
@@ -43,7 +49,7 @@ for service in $(echo "$services"); do
     curl -X POST \
       -H "Content-Type: application/json" \
       -H "Authorization: Key $GREMLIN_API_KEY" \
-      "$BASE_URL/services/$service_id/baseline?teamId=$GREMLIN_TEAM_ID" \
+      "$BASE_URL/services/$service_id/baseline?teamId=$TEAM_ID" \
       -H "accept: */*" \
       -d '{}'
 

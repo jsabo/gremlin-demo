@@ -1,9 +1,3 @@
-variable "region" {
-  description = "AWS Region of cluster"
-  type        = string
-  default     = "us-east-2"
-}
-
 variable "gremlin_team_id" {
   description = <<-DESC
     (Required) Team ID for Gremlin.
@@ -31,7 +25,7 @@ variable "gremlin_chart_version" {
 variable "otel_demo_chart_version" {
   description = "Opentelemetry Demo Helm Chart release version"
   type        = string
-  default     = "0.32.8"
+  default     = "0.33.8"
 }
 
 variable "datadog_api_key" {
@@ -51,4 +45,3 @@ variable "datadog_site" {
   type        = string
   default     = "datadoghq.com"
 }
-

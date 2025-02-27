@@ -54,6 +54,7 @@ locals {
   wordpress_password                 = var.wordpress_password
   wordpress_db_password              = var.wordpress_db_password
   otel_demo_chart_version            = var.otel_demo_chart_version
+  honeycomb_storefront_api_key       = var.honeycomb_storefront_api_key
   datadog_api_key                    = var.datadog_api_key
   datadog_site                       = var.datadog_site
 
@@ -192,5 +193,21 @@ resource "helm_release" "wordpress_prod" {
   values = [templatefile("${path.module}/helm_values/values-wordpress-prod.yaml", {
     wordpress_password    = local.wordpress_password
     wordpress_db_password = local.wordpress_db_password
+  })]
+}
+
+resource "helm_release" "opentelemetry-demo" {
+  name             = "otel-demo"
+  chart            = "opentelemetry-demo"
+  repository       = "https://open-telemetry.github.io/opentelemetry-helm-charts"
+  version          = local.otel_demo_chart_version
+  namespace        = "storefront"
+  create_namespace = true
+  values = [templatefile("${path.module}/helm_values/values-opentelemetry-demo.yaml", {
+    gremlin_team_id              = local.cluster_name
+    honeycomb_storefront_api_key = local.honeycomb_storefront_api_key
+    datadog_api_key              = local.datadog_api_key
+    datadog_site                 = local.datadog_site
+    gremlin_cluster_id           = local.cluster_name
   })]
 }

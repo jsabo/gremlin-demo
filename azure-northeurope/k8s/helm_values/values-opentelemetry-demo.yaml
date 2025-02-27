@@ -7,44 +7,6 @@ opentelemetry-collector:
     limits:
       memory: "1Gi"
       cpu: "500m"
-  config:
-    receivers:
-      redis:
-        endpoint: "otel-demo-valkey:6379"
-    exporters:
-      datadog:
-        traces:
-          span_name_as_resource_name: true
-          trace_buffer: 500
-        hostname: "otelcol-helm"
-        api:
-          site: '${datadog_site}'
-          key: '${datadog_api_key}'
-
-    processors:
-      resource:
-        attributes:
-          - key: deployment.environment
-            value: "${gremlin_cluster_id}"
-            action: upsert
-
-    connectors:
-      datadog/connector:
-        traces:
-          span_name_as_resource_name: true
-
-    service:
-      pipelines:
-        traces:
-          processors: [resource, batch]
-          exporters: [otlp, debug, spanmetrics, datadog, datadog/connector]
-        metrics:
-          receivers: [httpcheck/frontendproxy, otlp, redis, spanmetrics, datadog/connector]
-          processors: [resource, batch]
-          exporters: [otlphttp/prometheus, debug, datadog]
-        logs:
-          processors: [resource, batch]
-          exporters: [opensearch, debug, datadog]
 
 prometheus:
   enabled: true
@@ -184,8 +146,9 @@ components:
         alb.ingress.kubernetes.io/target-type: ip
         alb.ingress.kubernetes.io/target-node-labels: kubernetes.io/os=linux
         alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+        alb.ingress.kubernetes.io/rule-type: host
       hosts:
-        - host: ""
+        - host: "storefront.gremlin.rocks"
           paths:
             - path: /
               pathType: Prefix

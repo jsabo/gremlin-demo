@@ -7,7 +7,7 @@ set -euo pipefail
 ACTION=${1:-}
 SUFFIX=${2:-}
 TEAM_ID=${3:-}
-NAMESPACE="otel-demo"
+NAMESPACE="storefront"
 
 if [[ "$ACTION" != "add" && "$ACTION" != "remove" ]]; then
   echo "Invalid option. Use 'add' to add annotations or 'remove' to remove annotations."
@@ -20,23 +20,23 @@ if [[ "$ACTION" == "add" && -z "$TEAM_ID" ]]; then
 fi
 
 SERVICES=(
-  "otel-demo-accountingservice:accounting-service"
-  "otel-demo-adservice:ad-service"
-  "otel-demo-cartservice:cart-service"
-  "otel-demo-checkoutservice:checkout-service"
-  "otel-demo-currencyservice:currency-service"
-  "otel-demo-emailservice:email-service"
-  "otel-demo-frauddetectionservice:fraud-detection-service"
-  "otel-demo-frontend:frontend"
-  "otel-demo-frontendproxy:frontend-proxy"
-  "otel-demo-imageprovider:image-provider"
-  "otel-demo-kafka:kafka"
-  "otel-demo-paymentservice:payment-service"
-  "otel-demo-productcatalogservice:product-catalog-service"
-  "otel-demo-quoteservice:quote-service"
-  "otel-demo-recommendationservice:recommendation-service"
-  "otel-demo-shippingservice:shipping-service"
-  "otel-demo-valkey:valkey"
+  "otel-demo-accountingservice:Accounting-Service"
+  "otel-demo-adservice:Ad-Service"
+  "otel-demo-cartservice:Cart-Service"
+  "otel-demo-checkoutservice:Checkout-Service"
+  "otel-demo-currencyservice:Currency-Service"
+  "otel-demo-emailservice:Email-Service"
+  "otel-demo-frauddetectionservice:Fraud-Detection-Service"
+  "otel-demo-frontend:Frontend"
+  "otel-demo-frontendproxy:Frontend-Proxy"
+  "otel-demo-imageprovider:Image-Provider"
+  "otel-demo-kafka:Kafka-Service"
+  "otel-demo-paymentservice:Payment-Service"
+  "otel-demo-productcatalogservice:Product-Catalog-Service"
+  "otel-demo-quoteservice:Quote-Service"
+  "otel-demo-recommendationservice:Recommendation-Service"
+  "otel-demo-shippingservice:Shipping-Service"
+  "otel-demo-valkey:Valkey"
 )
 
 for SERVICE in "${SERVICES[@]}"; do

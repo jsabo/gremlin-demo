@@ -34,6 +34,15 @@ variable "otel_demo_chart_version" {
   default     = "0.33.8"
 }
 
+variable "honeycomb_storefront_api_key" {
+  description = <<-DESC
+    (Required) API Key for Honeycomb Storefront.
+    Use the environment variable TF_VAR_honeycomb_storefront_api_key if you prefer not to hard-code this value.
+  DESC
+  type        = string
+  sensitive   = true
+}
+
 variable "datadog_api_key" {
   description = <<-DESC
     (Required) API Key for Datadog.

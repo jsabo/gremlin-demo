@@ -49,8 +49,8 @@ resource "azurerm_kubernetes_cluster" "aks" {
     vm_size        = var.nodepool_vm_size
     vnet_subnet_id = module.aks_network.subnet_ids["aks-subnet"]
     type           = "VirtualMachineScaleSets"
-    zones = ["1", "2", "3"]
-    temporary_name_for_rotation = "rotation"
+    # zones = ["1", "2", "3"]
+    # temporary_name_for_rotation = "rotation"
   }
 
   identity {

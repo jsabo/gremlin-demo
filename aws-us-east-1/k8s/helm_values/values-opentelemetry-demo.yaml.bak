@@ -7,31 +7,6 @@ opentelemetry-collector:
     limits:
       memory: "1Gi"
       cpu: "500m"
-  config:
-    exporters:
-      otlp/honeycomb:
-        endpoint: "api.honeycomb.io:443"
-        headers:
-          "x-honeycomb-team": "${honeycomb_storefront_api_key}"
-          "x-honeycomb-dataset": "storefront-metrics"
-    service:
-      pipelines:
-        traces:
-          exporters:
-            - otlp
-            - debug
-            - spanmetrics
-            - otlp/honeycomb
-        metrics:
-          exporters:
-            - otlphttp/prometheus
-            - debug
-            - otlp/honeycomb
-        logs:
-          exporters:
-            - opensearch
-            - debug
-            - otlp/honeycomb
 
 prometheus:
   enabled: true
@@ -171,9 +146,8 @@ components:
         alb.ingress.kubernetes.io/target-type: ip
         alb.ingress.kubernetes.io/target-node-labels: kubernetes.io/os=linux
         alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
-        alb.ingress.kubernetes.io/rule-type: host
       hosts:
-        - host: "storefront.gremlin.rocks"
+        - host: ""
           paths:
             - path: /
               pathType: Prefix
