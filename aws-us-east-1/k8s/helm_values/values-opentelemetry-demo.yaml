@@ -8,6 +8,9 @@ opentelemetry-collector:
       memory: "1Gi"
       cpu: "500m"
   config:
+    receivers:
+      redis:
+        endpoint: "otel-demo-valkey:6379"
     exporters:
       otlp/honeycomb:
         endpoint: "api.honeycomb.io:443"
