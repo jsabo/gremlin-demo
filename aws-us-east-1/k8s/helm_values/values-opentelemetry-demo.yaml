@@ -175,6 +175,7 @@ components:
         alb.ingress.kubernetes.io/target-node-labels: kubernetes.io/os=linux
         alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
         alb.ingress.kubernetes.io/rule-type: host
+        alb.ingress.kubernetes.io/inbound-cidrs: "67.240.102.0/24"
       hosts:
         - host: "storefront.gremlin.rocks"
           paths:

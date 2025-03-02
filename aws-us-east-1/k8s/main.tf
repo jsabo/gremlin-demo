@@ -157,19 +157,6 @@ resource "helm_release" "gremlin" {
   })]
 }
 
-resource "helm_release" "wordpress_dev" {
-  name             = "wordpress"
-  repository       = "oci://registry-1.docker.io/bitnamicharts"
-  chart            = "wordpress"
-  version          = "24.1.9"
-  namespace        = "wordpress-dev"
-  create_namespace = true
-  values = [templatefile("${path.module}/helm_values/values-wordpress-dev.yaml", {
-    wordpress_password    = local.wordpress_password
-    wordpress_db_password = local.wordpress_db_password
-  })]
-}
-
 resource "helm_release" "wordpress_test" {
   name             = "wordpress"
   repository       = "oci://registry-1.docker.io/bitnamicharts"
