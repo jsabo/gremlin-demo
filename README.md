@@ -98,7 +98,7 @@ To create markers, use the following details:
 - **Request URL:**  
   `https://api.honeycomb.io/1/markers/__all__`
 
- > **Note:** The dataset slug or use `__all__` for endpoints that support env    ironment-wide operations.
+ > **Note:** The dataset slug or use `__all__` for endpoints that support environment-wide operations.
 
 - **Custom Headers:**  
   - **Key:** `X-Honeycomb-Team`  
