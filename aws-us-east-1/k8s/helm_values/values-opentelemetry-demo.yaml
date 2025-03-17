@@ -1,16 +1,31 @@
 opentelemetry-collector:
   enabled: true
+  image:
+    repository: "otel/opentelemetry-collector-contrib"
+  fullnameOverride: otel-collector
+  mode: deployment
+  presets:
+    kubernetesAttributes:
+      enabled: true
   resources:
     requests:
-      memory: "500Mi"
-      cpu: "250m"
+      cpu: "50m"      # Guarantees 0.05 of a CPU core
+      memory: "64Mi"   # Guarantees 64 MiB of memory
     limits:
-      memory: "1Gi"
-      cpu: "500m"
+      cpu: "500m"      # Caps CPU usage at 0.5 of a CPU core
+      memory: "1Gi"     # Caps memory usage at 1 GiB
+  service:
+    type: ClusterIP
+  ports:
+    metrics:
+      enabled: true
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    opentelemetry_community_demo: "true"
   config:
     receivers:
       redis:
-        endpoint: "otel-demo-valkey:6379"
+        endpoint: "valkey-cart:6379"
     exporters:
       otlp/honeycomb:
         endpoint: "api.honeycomb.io:443"
@@ -40,27 +55,34 @@ prometheus:
   enabled: true
   resources:
     requests:
-      memory: "500Mi"
-      cpu: "250m"
+      cpu: "50m"
+      memory: "64Mi"
     limits:
-      memory: "1Gi"
       cpu: "500m"
+      memory: "1Gi"
 
 opensearch:
   enabled: true
   replicas: 1
   resources:
     requests:
-      memory: "1Gi"
-      cpu: "1000m"
+      cpu: "50m"
+      memory: "64Mi"
     limits:
-      memory: "2Gi"
-      cpu: "2000m"
-      
+      cpu: "500m"
+      memory: "1Gi"
+
 components:
-  accountingService:
+  accounting:
     enabled: true
     replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
     schedulingRules:
       affinity:
         podAntiAffinity:
@@ -73,9 +95,16 @@ components:
                       - accountingservice
               topologyKey: topology.kubernetes.io/zone
 
-  adService:
+  ad:
     enabled: true
     replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
     schedulingRules:
       affinity:
         podAntiAffinity:
@@ -88,9 +117,16 @@ components:
                       - adservice
               topologyKey: topology.kubernetes.io/zone
 
-  cartService:
+  cart:
     enabled: true
     replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
     schedulingRules:
       affinity:
         podAntiAffinity:
@@ -103,9 +139,16 @@ components:
                       - cartservice
               topologyKey: topology.kubernetes.io/zone
 
-  checkoutService:
+  checkout:
     enabled: true
     replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
     schedulingRules:
       affinity:
         podAntiAffinity:
@@ -118,9 +161,16 @@ components:
                       - checkoutservice
               topologyKey: topology.kubernetes.io/zone
 
-  currencyService:
+  currency:
     enabled: true
     replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
     schedulingRules:
       affinity:
         podAntiAffinity:
@@ -133,9 +183,16 @@ components:
                       - currencyservice
               topologyKey: topology.kubernetes.io/zone
 
-  emailService:
+  email:
     enabled: true
     replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
     schedulingRules:
       affinity:
         podAntiAffinity:
@@ -151,6 +208,13 @@ components:
   frontend:
     enabled: true
     replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
     schedulingRules:
       affinity:
         podAntiAffinity:
@@ -163,9 +227,16 @@ components:
                       - frontend
               topologyKey: topology.kubernetes.io/zone
 
-  frontendProxy:
+  frontend-proxy:
     enabled: true
     replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
     ingress:
       enabled: true
       ingressClassName: alb
@@ -194,9 +265,16 @@ components:
                       - frontendproxy
               topologyKey: topology.kubernetes.io/zone
 
-  paymentService:
+  payment:
     enabled: true
     replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
     schedulingRules:
       affinity:
         podAntiAffinity:
@@ -209,9 +287,16 @@ components:
                       - paymentservice
               topologyKey: topology.kubernetes.io/zone
 
-  productCatalogService:
+  product-catalog:
     enabled: true
     replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
     schedulingRules:
       affinity:
         podAntiAffinity:
@@ -224,9 +309,16 @@ components:
                       - productcatalogservice
               topologyKey: topology.kubernetes.io/zone
 
-  quoteService:
+  quote:
     enabled: true
     replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
     schedulingRules:
       affinity:
         podAntiAffinity:
@@ -239,9 +331,16 @@ components:
                       - quoteservice
               topologyKey: topology.kubernetes.io/zone
 
-  recommendationService:
+  recommendation:
     enabled: true
     replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
     schedulingRules:
       affinity:
         podAntiAffinity:
@@ -254,9 +353,16 @@ components:
                       - recommendationservice
               topologyKey: topology.kubernetes.io/zone
 
-  shippingService:
+  shipping:
     enabled: true
     replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
     schedulingRules:
       affinity:
         podAntiAffinity:
@@ -269,9 +375,16 @@ components:
                       - shippingservice
               topologyKey: topology.kubernetes.io/zone
 
-  imageprovider:
+  image-provider:
     enabled: true
     replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
     schedulingRules:
       affinity:
         podAntiAffinity:
@@ -284,9 +397,16 @@ components:
                       - imageprovider
               topologyKey: topology.kubernetes.io/zone
 
-  valkey:
+  valkey-cart:
     enabled: true
     replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
     schedulingRules:
       affinity:
         podAntiAffinity:
@@ -299,9 +419,16 @@ components:
                       - valkey
               topologyKey: topology.kubernetes.io/zone
 
-  frauddetectionService:
+  fraud-detection:
     enabled: true
     replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
     schedulingRules:
       affinity:
         podAntiAffinity:
@@ -316,14 +443,14 @@ components:
 
   kafka:
     enabled: true
-    replicas: 2
+    replicas: 1
     resources:
       requests:
-        memory: "600Mi"
-        cpu: "250m"
+        cpu: "50m"
+        memory: "64Mi"
       limits:
-        memory: "1Gi"
         cpu: "500m"
+        memory: "1Gi"
     schedulingRules:
       affinity:
         podAntiAffinity:
@@ -336,12 +463,38 @@ components:
                       - kafka
               topologyKey: topology.kubernetes.io/zone
 
-  loadgenerator:
+  load-generator:
     enabled: true
+    replicas: 1
     resources:
       requests:
-        memory: "1Gi"
-        cpu: "1000m"
+        cpu: "50m"
+        memory: "64Mi"
       limits:
-        memory: "2Gi"
-        cpu: "2000m"
+        cpu: "500m"
+        memory: "1Gi"
+
+  flagd:
+    enabled: true
+    replicas: 1
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+    sidecarContainers:
+      - name: flagd-ui
+        useDefault:
+          env: true
+        service:
+          port: 4000
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "64Mi"
+          limits:
+            cpu: "500m"
+            memory: "1Gi"
+

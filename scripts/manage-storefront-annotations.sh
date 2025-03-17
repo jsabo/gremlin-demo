@@ -20,23 +20,23 @@ if [[ "$ACTION" == "add" && -z "$TEAM_ID" ]]; then
 fi
 
 SERVICES=(
-  "accountingservice:Accounting-Service"
-  "adservice:Ad-Service"
-  "cartservice:Cart-Service"
-  "checkoutservice:Checkout-Service"
-  "currencyservice:Currency-Service"
-  "emailservice:Email-Service"
-  "frauddetectionservice:Fraud-Detection-Service"
+  "accounting:Accounting-Service"
+  "ad:Ad-Service"
+  "cart:Cart-Service"
+  "checkout:Checkout-Service"
+  "currency:Currency-Service"
+  "email:Email-Service"
+  "fraud-detection:Fraud-Detection-Service"
   "frontend:Frontend"
-  "frontendproxy:Frontend-Proxy"
-  "imageprovider:Image-Provider"
+  "frontend-proxy:Frontend-Proxy"
+  "image-provider:Image-Provider"
   "kafka:Kafka-Service"
-  "paymentservice:Payment-Service"
-  "productcatalogservice:Product-Catalog-Service"
-  "quoteservice:Quote-Service"
-  "recommendationservice:Recommendation-Service"
-  "shippingservice:Shipping-Service"
-  "valkey:Valkey"
+  "payment:Payment-Service"
+  "product-catalog:Product-Catalog-Service"
+  "quote:Quote-Service"
+  "recommendation:Recommendation-Service"
+  "shipping:Shipping-Service"
+  "valkey-cart:Valkey-Cart-Service"
 )
 
 for SERVICE in "${SERVICES[@]}"; do
