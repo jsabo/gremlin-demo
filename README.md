@@ -114,6 +114,15 @@ To create markers, use the following details:
   }
   ```
 
+### Dynatrace
+
+
+Get Dynatrace Synthetic Monitor Locations
+
+```
+curl -X GET -s -H "Authorization: Api-Token $TF_VAR_dnyatrace_api_token" https://qpm46186.live.dynatrace.com/api/v1/synthetic/locations | jq '.locations[] | select(.name=="Dublin" and .cloudPlatform=="AMAZON_EC2")'
+```
+
 ---
 
 ## Contributing

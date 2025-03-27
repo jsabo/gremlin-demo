@@ -56,10 +56,10 @@ prometheus:
   resources:
     requests:
       cpu: "50m"
-      memory: "64Mi"
+      memory: "2Gi"
     limits:
       cpu: "500m"
-      memory: "1Gi"
+      memory: "15Gi"
 
 opensearch:
   enabled: true

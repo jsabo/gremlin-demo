@@ -1,5 +1,22 @@
 #!/bin/bash
 
+# Default auto approval flag to false.
+AUTO_APPROVE=false
+
+# Process any flags that begin with '--'
+while [[ "$1" == --* ]]; do
+  case "$1" in
+    --auto-approve)
+      AUTO_APPROVE=true
+      shift
+      ;;
+    *)
+      echo "Unknown option: $1"
+      exit 1
+      ;;
+  esac
+done
+
 # Check if a team ID was provided as an argument; otherwise, use the GREMLIN_TEAM_ID environment variable.
 if [ -n "$1" ]; then
   TEAM_ID="$1"
@@ -39,10 +56,14 @@ for service in $(echo "$services"); do
   service_id=$(echo "$service" | jq -r '.serviceId')
 
   echo "Service: $service_name (ID: $service_id)"
-  echo "Do you want to run full tests for this service? (y/n)"
   
-  # Use `read` to capture user input
-  read -p "Enter choice: " answer
+  if [ "$AUTO_APPROVE" = true ]; then
+    echo "Auto-approving full tests for $service_name..."
+    answer="y"
+  else
+    echo "Do you want to run full tests for this service? (y/n)"
+    read -p "Enter choice: " answer
+  fi
 
   if [[ "$answer" == "y" || "$answer" == "Y" ]]; then
     echo "Running full tests for $service_name..."
