@@ -19,5 +19,5 @@ variable "gremlin_team_secret" {
 variable "gremlin_chart_version" {
   description = "Gremlin Helm Chart release version"
   type        = string
-  default     = "0.19.0"
+  default     = "0.20.2"
 }
