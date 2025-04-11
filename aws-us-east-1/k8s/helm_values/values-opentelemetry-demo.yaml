@@ -58,7 +58,7 @@ prometheus:
       cpu: "50m"
       memory: "2Gi"
     limits:
-      cpu: "500m"
+      cpu: "1"
       memory: "15Gi"
 
 opensearch:
