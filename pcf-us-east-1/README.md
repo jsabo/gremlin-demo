@@ -2,8 +2,6 @@
 
 This guide provides step‑by‑step instructions to deploy Cloud Foundry on AWS using BOSH Bootloader (bbl) along with BOSH and cf‑deployment. The instructions assume you’re running on Ubuntu and that you have your AWS credentials available.
 
----
-
 ## Prerequisites
 
 ### 1. Update the System & Install Build Dependencies
@@ -13,8 +11,6 @@ Update your package lists and install the necessary build dependencies and Ruby:
 ```bash
 sudo apt update && sudo apt install -y build-essential zlib1g-dev libssl-dev libreadline-dev libffi-dev ruby-full
 ```
-
----
 
 ## Tool Installation
 
@@ -66,8 +62,6 @@ Verify the installation:
 ```bash
 credhub --version
 ```
-
----
 
 ## Deploying the BOSH Director on AWS
 
@@ -124,8 +118,6 @@ If you require a load balancer (for example, to expose the Cloud Foundry API):
           --aws-region us-east-1 \
           --iaas aws
    ```
-
----
 
 ## Deploying Cloud Foundry
 
@@ -188,8 +180,6 @@ bosh -e bosh-1 -d cf deploy cf-deployment.yml \
    cf target -o "system" -s "sabo"
    ```
 
----
-
 ## BOSH CLI Environment Inspection Commands
 
 Use these commands to check the state and configuration of your director before deploying Cloud Foundry:
@@ -235,8 +225,6 @@ Use these commands to check the state and configuration of your director before 
   ```bash
   bosh tasks
   ```
-
----
 
 ## References
 
