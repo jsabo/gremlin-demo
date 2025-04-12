@@ -86,7 +86,7 @@ export BOSH_ENVIRONMENT=$(bbl director-address)
 bosh log-in
 ```
 
-### 8. (Optional) Setup Load Balancers with Self‑Signed Certificates
+### 8. Setup Load Balancers with Self‑Signed Certificates
 
 If you require a load balancer (for example, to expose the Cloud Foundry API):
 
