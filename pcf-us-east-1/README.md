@@ -1,6 +1,6 @@
 # Deploying Cloud Foundry on AWS with BOSH Bootloader
 
-This guide provides step‑by‑step instructions to deploy Cloud Foundry on AWS using BOSH Bootloader (bbl) along with BOSH and cf‑deployment. The instructions assume you’re running on Ubuntu and that you have your AWS credentials available.
+This guide provides step‑by‑step instructions to deploy Cloud Foundry on AWS using BOSH Bootloader (bbl), BOSH, and cf‑deployment. The instructions assume you’re running on Ubuntu with your AWS credentials available.
 
 ## Prerequisites
 
@@ -9,7 +9,13 @@ This guide provides step‑by‑step instructions to deploy Cloud Foundry on AWS
 Update your package lists and install the necessary build dependencies and Ruby:
 
 ```bash
-sudo apt update && sudo apt install -y build-essential zlib1g-dev libssl-dev libreadline-dev libffi-dev ruby-full
+sudo apt update && sudo apt install -y \
+  build-essential \
+  zlib1g-dev \
+  libssl-dev \
+  libreadline-dev \
+  libffi-dev \
+  ruby-full
 ```
 
 ## Tool Installation
@@ -44,7 +50,7 @@ chmod +x bbl
 ```
 
 > **Tip:** To make these binaries available system‑wide, move them to `/usr/local/bin/`:
->
+> 
 > ```bash
 > sudo mv bbl bosh terraform /usr/local/bin/
 > ```
@@ -63,11 +69,30 @@ Verify the installation:
 credhub --version
 ```
 
+### 6. Install the Cloud Foundry CLI (Linux)
+
+Run these commands to download, extract, and install the Cloud Foundry CLI:
+
+```bash
+# Download and extract the Linux 64-bit CLI (v8)
+curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&version=v8&source=github" | tar -zx
+
+# Move the 'cf8' binary and its 'cf' symlink to /usr/local/bin (or a directory in your $PATH)
+sudo mv cf8 /usr/local/bin
+sudo mv cf /usr/local/bin
+
+# Install Bash tab completion for cf on Ubuntu (takes effect after restarting your shell)
+sudo curl -o /usr/share/bash-completion/completions/cf8 https://raw.githubusercontent.com/cloudfoundry/cli-ci/master/ci/installers/completion/cf8
+
+# Confirm the installation by checking the cf CLI version
+cf version
+```
+
 ## Deploying the BOSH Director on AWS
 
-### 6. Deploy the BOSH Environment
+### 7. Deploy the BOSH Environment
 
-Make sure your AWS credentials are set in your environment variables, then run:
+Make sure your AWS credentials are set as environment variables, then run:
 
 ```bash
 bbl up --aws-access-key-id $BBL_AWS_SECRET_ACCESS_KEY_ID \
@@ -76,7 +101,7 @@ bbl up --aws-access-key-id $BBL_AWS_SECRET_ACCESS_KEY_ID \
        --iaas aws
 ```
 
-### 7. Log In to BOSH
+### 8. Log In to BOSH
 
 After the director is deployed, export the environment variables and log in:
 
@@ -86,49 +111,49 @@ export BOSH_ENVIRONMENT=$(bbl director-address)
 bosh log-in
 ```
 
-### 8. Setup Load Balancers with Self‑Signed Certificates
+### 9. Set Up Load Balancers with Self‑Signed Certificates
 
-If you require a load balancer (for example, to expose the Cloud Foundry API):
+If you require a load balancer (for example, to expose the Cloud Foundry API), follow these steps:
 
-1. **Create Self‑Signed Certificates:**
+#### a. Create Self‑Signed Certificates
 
-   ```bash
-   openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-     -keyout sabo.gremlin.rocks.key \
-     -out sabo.gremlin.rocks.crt \
-     -subj "/CN=sabo.gremlin.rocks"
-   ```
+```bash
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+  -keyout sabo.gremlin.rocks.key \
+  -out sabo.gremlin.rocks.crt \
+  -subj "/CN=sabo.gremlin.rocks"
+```
 
-2. **Plan the Environment with Load Balancer Settings:**
+#### b. Plan the Environment with Load Balancer Settings
 
-   ```bash
-   bbl plan --lb-type cf \
-            --lb-cert sabo.gremlin.rocks.crt \
-            --lb-key sabo.gremlin.rocks.key \
-            --aws-access-key-id $BBL_AWS_SECRET_ACCESS_KEY_ID \
-            --aws-secret-access-key $BBL_AWS_SECRET_ACCESS_KEY \
-            --lb-domain sabo.gremlin.rocks
-   ```
+```bash
+bbl plan --lb-type cf \
+         --lb-cert sabo.gremlin.rocks.crt \
+         --lb-key sabo.gremlin.rocks.key \
+         --aws-access-key-id $BBL_AWS_SECRET_ACCESS_KEY_ID \
+         --aws-secret-access-key $BBL_AWS_SECRET_ACCESS_KEY \
+         --lb-domain sabo.gremlin.rocks
+```
 
-3. **Update the Environment:**
+#### c. Update the Environment
 
-   ```bash
-   bbl up --aws-access-key-id $BBL_AWS_SECRET_ACCESS_KEY_ID \
-          --aws-secret-access-key $BBL_AWS_SECRET_ACCESS_KEY \
-          --aws-region us-east-1 \
-          --iaas aws
-   ```
+```bash
+bbl up --aws-access-key-id $BBL_AWS_SECRET_ACCESS_KEY_ID \
+       --aws-secret-access-key $BBL_AWS_SECRET_ACCESS_KEY \
+       --aws-region us-east-1 \
+       --iaas aws
+```
 
 ## Deploying Cloud Foundry
 
-### 9. Clone the cf-deployment Repository
+### 10. Clone the cf-deployment Repository
 
 ```bash
 git clone https://github.com/cloudfoundry/cf-deployment.git
 cd cf-deployment
 ```
 
-### 10. Upload a Stemcell
+### 11. Upload a Stemcell
 
 Cloud Foundry requires a stemcell (a virtual machine image). First, set your IAAS information and fetch the default stemcell version from the manifest:
 
@@ -143,7 +168,7 @@ Then, upload the corresponding stemcell (adjust the URL if necessary):
 bosh upload-stemcell "https://bosh.io/d/stemcells/bosh-${IAAS_INFO}-ubuntu-jammy-go_agent?v=${STEMCELL_VERSION}"
 ```
 
-### 11. Deploy Cloud Foundry
+### 12. Deploy Cloud Foundry
 
 Set your system domain, alias your BOSH environment, and deploy cf-deployment with your chosen ops files:
 
@@ -161,28 +186,28 @@ bosh -e bosh-1 -d cf deploy cf-deployment.yml \
   -n
 ```
 
-> **Note:** The ops files above are provided as examples. Adjust them as needed for your AWS settings and deployment strategy.
+> **Note:** The ops files above are examples. Adjust them as needed for your AWS settings and deployment strategy.
 
-### 12. Retrieve CF Credentials and Log In
+### 13. Retrieve CF Credentials and Log In
 
-1. **Get the Initial Admin Password from CredHub:**
+#### a. Get the Initial Admin Password from CredHub
 
-   ```bash
-   credhub find -n cf_admin_password
-   credhub get -n /bosh-bbl-env-<your-env-name>/cf/cf_admin_password
-   ```
+```bash
+credhub find -n cf_admin_password
+credhub get -n /bosh-bbl-env-<your-env-name>/cf/cf_admin_password
+```
 
-2. **Target the Cloud Foundry API and Log In:**
+#### b. Target the Cloud Foundry API and Log In
 
-   ```bash
-   cf api https://api.sys.sabo.gremlin.rocks --skip-ssl-validation
-   cf create-space sabo
-   cf target -o "system" -s "sabo"
-   ```
+```bash
+cf api https://api.sys.sabo.gremlin.rocks --skip-ssl-validation
+cf create-space sabo
+cf target -o "system" -s "sabo"
+```
 
 ## BOSH CLI Environment Inspection Commands
 
-Use these commands to check the state and configuration of your director before deploying Cloud Foundry:
+Use these commands to check the state and configuration of your director before or after deploying Cloud Foundry:
 
 - **List VMs:**
 
