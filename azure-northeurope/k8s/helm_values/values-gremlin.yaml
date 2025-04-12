@@ -5,6 +5,7 @@ gremlin:
     type: secret
     teamID: '${gremlin_team_id}'
     teamSecret: '${gremlin_team_secret}'
+  apparmor: unconfined
   hostPID: true
   hostNetwork: true
   container:

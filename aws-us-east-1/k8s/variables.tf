@@ -31,7 +31,7 @@ variable "gremlin_chart_version" {
 variable "otel_demo_chart_version" {
   description = "Opentelemetry Demo Helm Chart release version"
   type        = string
-  default     = "0.36.1"
+  default     = "0.37.0"
 }
 
 variable "honeycomb_storefront_api_key" {

@@ -33,8 +33,6 @@ locals {
   gremlin_chart_version        = var.gremlin_chart_version
   otel_demo_chart_version      = var.otel_demo_chart_version
   honeycomb_storefront_api_key = var.honeycomb_storefront_api_key
-  datadog_api_key              = var.datadog_api_key
-  datadog_site                 = var.datadog_site
 }
 
 resource "helm_release" "gremlin" {
@@ -60,9 +58,7 @@ resource "helm_release" "opentelemetry-demo" {
   create_namespace = true
   values = [templatefile("${path.module}/helm_values/values-opentelemetry-demo.yaml", {
     gremlin_team_id              = local.cluster_name
-    honeycomb_storefront_api_key = local.honeycomb_storefront_api_key
-    datadog_api_key              = local.datadog_api_key
-    datadog_site                 = local.datadog_site
     gremlin_cluster_id           = local.cluster_name
+    honeycomb_storefront_api_key = local.honeycomb_storefront_api_key
   })]
 }
