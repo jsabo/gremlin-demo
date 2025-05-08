@@ -2,19 +2,6 @@
 
 This repository contains scripts and examples to integrate with Gremlin SaaS. The provided examples cover managing service annotations, running service reliability tests, and interacting with the Honeycomb API.
 
-## Table of Contents
-- [Manage Service Annotations](#manage-service-annotations)
-  - [Storefront Annotations](#storefront-annotations)
-  - [WordPress Annotations](#wordpress-annotations)
-- [Run Service Reliability Tests](#run-service-reliability-tests)
-- [Honeycomb API](#honeycomb-api)
-  - [List All Triggers](#list-all-triggers)
-  - [Get All SLOs](#get-all-slos)
-  - [Markers](#markers)
-- [Contributing](#contributing)
-
----
-
 ## Manage Service Annotations
 
 Use these scripts to manage annotations for various services.
@@ -31,27 +18,8 @@ Run the following command to manage storefront annotations:
 
 ```bash
 ./scripts/manage-storefront-annotations.sh add East b8d5b49a-36cb-461f-95b4-9a36cb061ffe storefront
+./scripts/manage-storefront-annotations.sh add North-Europe bf0c2a69-5d62-4cd4-8c2a-695d623cd419 storefront
 ```
-
-### WordPress Annotations
-
-Run the following command to manage WordPress annotations:
-
-```bash
-./scripts/manage-wordpress-annotations.sh <Action> <Suffix> <Team ID> <Namespace>
-```
-
-**Examples:**
-
-```bash
-./scripts/manage-wordpress-annotations.sh add Test 0e1177cd-d46b-43e4-9177-cdd46b33e402 wordpress-test
-```
-
-```bash
-./scripts/manage-wordpress-annotations.sh add Prod 0e1177cd-d46b-43e4-9177-cdd46b33e402 wordpress-prod
-```
-
----
 
 ## Run Service Reliability Tests
 
@@ -66,8 +34,6 @@ Execute the following script to run service reliability tests:
 ```bash
 ./scripts/test-services.sh 0e1177cd-d46b-43e4-9177-cdd46b33e402
 ```
-
----
 
 ## Honeycomb API
 
@@ -116,16 +82,8 @@ To create markers, use the following details:
 
 ### Dynatrace
 
-
 Get Dynatrace Synthetic Monitor Locations
 
 ```
 curl -X GET -s -H "Authorization: Api-Token $TF_VAR_dnyatrace_api_token" https://qpm46186.live.dynatrace.com/api/v1/synthetic/locations | jq '.locations[] | select(.name=="Dublin" and .cloudPlatform=="AMAZON_EC2")'
 ```
-
----
-
-## Contributing
-
-Feel free to submit issues or pull requests to enhance these examples further. 
-
