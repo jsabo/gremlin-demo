@@ -1,0 +1,49 @@
+controller:
+  hostNetwork: false
+  addHeaders:
+    X-Content-Type-Options: nosniff
+    X-Frame-Options: SAMEORIGIN
+  resources:
+    limits:
+      memory: "256Mi"
+    requests:
+      cpu: "50m"
+      memory: "128M"
+  config:
+    ssl-redirect: 'false'  # Turn off SSL redirection
+    client-header-buffer-size: '64k'
+    http2-max-field-size: '64k'
+    http2-max-header-size: '64k'
+    large-client-header-buffers: '4 64k'
+    upstream-keepalive-timeout: '120'
+    keep-alive: '10'
+    use-forwarded-headers: 'true'
+    proxy-real-ip-cidr: '10.0.0.0/20'
+    proxy-buffer-size: '8k'
+
+  watchIngressWithoutClass: true
+  # extraArgs:
+    # default-ssl-certificate: ingress/tls-secret  # Comment this line out or remove it
+  service:
+    internal:
+      enabled: false
+    external:
+      enabled: true
+    ports:
+      http: 80
+      # https: 443  # Optional: Remove this line if you want to disable the HTTPS port
+    type: ClusterIP
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 1
+    type: RollingUpdate
+  metrics:
+    enabled: true
+defaultBackend:
+  enabled: false
+serviceAccount:
+  create: true
+  name: nginx-ingress-service-account
+rbac:
+  create: true
+

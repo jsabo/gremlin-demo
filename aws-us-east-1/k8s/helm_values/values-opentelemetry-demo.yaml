@@ -1,0 +1,500 @@
+opentelemetry-collector:
+  enabled: true
+  image:
+    repository: "otel/opentelemetry-collector-contrib"
+  fullnameOverride: otel-collector
+  mode: deployment
+  presets:
+    kubernetesAttributes:
+      enabled: true
+  resources:
+    requests:
+      cpu: "50m"      # Guarantees 0.05 of a CPU core
+      memory: "64Mi"   # Guarantees 64 MiB of memory
+    limits:
+      cpu: "500m"      # Caps CPU usage at 0.5 of a CPU core
+      memory: "1Gi"     # Caps memory usage at 1 GiB
+  service:
+    type: ClusterIP
+  ports:
+    metrics:
+      enabled: true
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    opentelemetry_community_demo: "true"
+  config:
+    receivers:
+      redis:
+        endpoint: "valkey-cart:6379"
+    exporters:
+      otlp/honeycomb:
+        endpoint: "api.honeycomb.io:443"
+        headers:
+          "x-honeycomb-team": "${honeycomb_storefront_api_key}"
+          "x-honeycomb-dataset": "storefront-metrics"
+    service:
+      pipelines:
+        traces:
+          exporters:
+            - otlp
+            - debug
+            - spanmetrics
+            - otlp/honeycomb
+        metrics:
+          exporters:
+            - otlphttp/prometheus
+            - debug
+            - otlp/honeycomb
+        logs:
+          exporters:
+            - opensearch
+            - debug
+            - otlp/honeycomb
+
+prometheus:
+  enabled: true
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "2Gi"
+    limits:
+      cpu: "1"
+      memory: "15Gi"
+
+opensearch:
+  enabled: true
+  replicas: 1
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "64Mi"
+    limits:
+      cpu: "500m"
+      memory: "1Gi"
+
+components:
+  accounting:
+    enabled: true
+    replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+    schedulingRules:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/component
+                    operator: In
+                    values:
+                      - accountingservice
+              topologyKey: topology.kubernetes.io/zone
+
+  ad:
+    enabled: true
+    replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+    schedulingRules:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/component
+                    operator: In
+                    values:
+                      - adservice
+              topologyKey: topology.kubernetes.io/zone
+
+  cart:
+    enabled: true
+    replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+    schedulingRules:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/component
+                    operator: In
+                    values:
+                      - cartservice
+              topologyKey: topology.kubernetes.io/zone
+
+  checkout:
+    enabled: true
+    replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+    schedulingRules:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/component
+                    operator: In
+                    values:
+                      - checkoutservice
+              topologyKey: topology.kubernetes.io/zone
+
+  currency:
+    enabled: true
+    replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+    schedulingRules:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/component
+                    operator: In
+                    values:
+                      - currencyservice
+              topologyKey: topology.kubernetes.io/zone
+
+  email:
+    enabled: true
+    replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+    schedulingRules:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/component
+                    operator: In
+                    values:
+                      - emailservice
+              topologyKey: topology.kubernetes.io/zone
+
+  frontend:
+    enabled: true
+    replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+    schedulingRules:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/component
+                    operator: In
+                    values:
+                      - frontend
+              topologyKey: topology.kubernetes.io/zone
+
+  frontend-proxy:
+    enabled: true
+    replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+    ingress:
+      enabled: true
+      ingressClassName: alb
+      annotations:
+        alb.ingress.kubernetes.io/scheme: internet-facing
+        alb.ingress.kubernetes.io/target-type: ip
+        alb.ingress.kubernetes.io/target-node-labels: kubernetes.io/os=linux
+        alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+        alb.ingress.kubernetes.io/rule-type: host
+        alb.ingress.kubernetes.io/inbound-cidrs: "67.240.102.0/24"
+      hosts:
+        - host: "storefront.gremlin.rocks"
+          paths:
+            - path: /
+              pathType: Prefix
+              port: 8080
+    schedulingRules:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/component
+                    operator: In
+                    values:
+                      - frontendproxy
+              topologyKey: topology.kubernetes.io/zone
+
+  payment:
+    enabled: true
+    replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+    schedulingRules:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/component
+                    operator: In
+                    values:
+                      - paymentservice
+              topologyKey: topology.kubernetes.io/zone
+
+  product-catalog:
+    enabled: true
+    replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+    schedulingRules:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/component
+                    operator: In
+                    values:
+                      - productcatalogservice
+              topologyKey: topology.kubernetes.io/zone
+
+  quote:
+    enabled: true
+    replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+    schedulingRules:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/component
+                    operator: In
+                    values:
+                      - quoteservice
+              topologyKey: topology.kubernetes.io/zone
+
+  recommendation:
+    enabled: true
+    replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+    schedulingRules:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/component
+                    operator: In
+                    values:
+                      - recommendationservice
+              topologyKey: topology.kubernetes.io/zone
+
+  shipping:
+    enabled: true
+    replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+    schedulingRules:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/component
+                    operator: In
+                    values:
+                      - shippingservice
+              topologyKey: topology.kubernetes.io/zone
+
+  image-provider:
+    enabled: true
+    replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+    schedulingRules:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/component
+                    operator: In
+                    values:
+                      - imageprovider
+              topologyKey: topology.kubernetes.io/zone
+
+  valkey-cart:
+    enabled: true
+    replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+    schedulingRules:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/component
+                    operator: In
+                    values:
+                      - valkey
+              topologyKey: topology.kubernetes.io/zone
+
+  fraud-detection:
+    enabled: true
+    replicas: 2
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+    schedulingRules:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/component
+                    operator: In
+                    values:
+                      - frauddetectionservice
+              topologyKey: topology.kubernetes.io/zone
+
+  kafka:
+    enabled: true
+    replicas: 1
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+    schedulingRules:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/component
+                    operator: In
+                    values:
+                      - kafka
+              topologyKey: topology.kubernetes.io/zone
+
+  load-generator:
+    enabled: true
+    replicas: 1
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+
+  flagd:
+    enabled: true
+    replicas: 1
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+    sidecarContainers:
+      - name: flagd-ui
+        useDefault:
+          env: true
+        service:
+          port: 4000
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "64Mi"
+          limits:
+            cpu: "500m"
+            memory: "1Gi"
+

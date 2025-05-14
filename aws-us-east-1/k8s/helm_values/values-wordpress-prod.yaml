@@ -1,0 +1,45 @@
+# WordPress settings
+wordpress:
+  replicaCount: 2
+
+# Wordpress password
+# User: user
+# Password: kubectl get secret --namespace wordpress-dev wordpress -o jsonpath="{.data.wordpress-password}" | base64 -d
+
+# Enable and configure the in-cluster MariaDB (default)
+mariadb:
+  enabled: true
+  auth:
+    rootPassword: '${wordpress_db_password}'
+    password: '${wordpress_db_password}'
+    username: "wordpress"
+    database: "wordpress"
+    
+# Enable memcached for caching (using Bitnami memcached subchart)
+memcached:
+  enabled: true
+  auth:
+    enabled: false
+
+# Persistence for WordPress data (adjust size and storageClass as required)
+persistence:
+  enabled: false
+  size: 20Gi
+
+# Change service type to ClusterIP
+service:
+  type: ClusterIP
+
+# Enable and configure Ingress
+ingress:
+  enabled: true
+  ingressClassName: alb
+  hostname: "wordpress.gremlin.rocks"
+  pathType: Prefix
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/target-node-labels: kubernetes.io/os=linux
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+    alb.ingress.kubernetes.io/rule-type: host
+  tls: false

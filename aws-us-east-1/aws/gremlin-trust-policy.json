@@ -1,0 +1,18 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::157733958145:role/GremlinReliabilityAnalyzer"
+      },
+      "Condition": {
+        "StringEquals": {
+          "sts:ExternalId": "8da66dfe-b6c6-5966-82dd-ffcdfafc39d4"
+        }
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+

@@ -1,0 +1,14 @@
+output "cluster_name" {
+  description = "GKE Cluster Name"
+  value       = google_container_cluster.primary.name
+}
+
+output "cluster_endpoint" {
+  description = "GKE Cluster endpoint"
+  value       = google_container_cluster.primary.endpoint
+}
+
+output "configure_kubectl" {
+  description = "Configure kubectl: ensure gcloud CLI is installed and run this command"
+  value       = "gcloud container clusters get-credentials ${google_container_cluster.primary.name} --region ${local.region} --project ${var.project}"
+}
