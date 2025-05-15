@@ -53,7 +53,7 @@ resource "google_container_node_pool" "scylla_nodes" {
     disk_size_gb    = 100
     disk_type       = "pd-ssd"
     image_type      = "UBUNTU_CONTAINERD"
-    local_ssd_count = 1 # Local NVMe SSDs for ScyllaDB
+    local_ssd_count = 0 # Optional Local NVMe SSDs for ScyllaDB
     oauth_scopes    = ["https://www.googleapis.com/auth/cloud-platform"]
     tags            = ["gke-node", local.name, "scylla"]
     labels = {
@@ -91,9 +91,10 @@ resource "google_container_node_pool" "rabbitmq_pool" {
   location = local.region
 
   node_config {
-    machine_type = "n2-standard-4" # (4 vCPU / 26 GiB RAM)
-    disk_size_gb = 375             # attach PD‑SSD or use local_ssd_count
+    machine_type = "n2-standard-4"
+    disk_size_gb = 100
     disk_type    = "pd-ssd"
+    local_ssd_count = 0 
     oauth_scopes = ["https://www.googleapis.com/auth/cloud-platform"]
     tags         = ["gke-node", local.name, "rabbitmq"]
     labels = {
