@@ -1,76 +1,90 @@
-# Gremlin Demo
+# Gremlin Demo Environments
 
-This repository contains scripts and examples to integrate with Gremlin SaaS. The provided examples cover managing service annotations, running service reliability tests, and interacting with the Honeycomb API.
+This repository provides infrastructure as code (IaC) to deploy managed Kubernetes clusters across multiple cloud providers, along with reliability tooling including **Gremlin**, **OpenTelemetry Demo**, **Honeycomb**, and **Dynatrace**.
 
-## Manage Service Annotations
+## 🚀 Overview
 
-Use these scripts to manage annotations for various services.
+Use this repository to:
 
-### Storefront Annotations
+* Provision managed Kubernetes clusters on AWS, Azure, and GCP.
+* Deploy Gremlin for fault injection testing.
+* Deploy the OpenTelemetry demo application to generate observability signals.
+* Configure Honeycomb and Dynatrace integrations.
+* Run scripts for chaos engineering experiments, health checks, and annotation management.
 
-Run the following command to manage storefront annotations:
+## 🌐 Cloud Environments
 
-```bash
-./scripts/manage-storefront-annotations.sh <Action> <Suffix> <Team ID> <Namespace>
-```
+Each cloud-specific folder includes Terraform code to deploy a Kubernetes cluster and related components:
 
-**Example:**
+* **AWS** (`./aws-us-east-1`)
 
-```bash
-./scripts/manage-storefront-annotations.sh add Aws b8d5b49a-36cb-461f-95b4-9a36cb061ffe storefront
-./scripts/manage-storefront-annotations.sh add Azure bf0c2a69-5d62-4cd4-8c2a-695d623cd419 storefront
-```
+  * EKS + supporting components
+  * Helm charts for Gremlin, OpenTelemetry Demo, WordPress, and more
 
-## Run Service Reliability Tests
+* **Azure** (`./azure-northeurope`)
 
-Execute the following script to run service reliability tests:
+  * AKS + VNet module
+  * Helm charts for Gremlin and OpenTelemetry Demo
 
-```bash
-./scripts/test-services.sh <Team ID>
-```
+* **GCP** (`./gke-us-east1`)
 
-**Example:**
+  * GKE (Standard + Autopilot)
+  * Helm charts for cert-manager, trust-manager, and RabbitMQ Operator
 
-```bash
-./scripts/test-services.sh 0e1177cd-d46b-43e4-9177-cdd46b33e402
-```
+## 🧰 Scripts
 
-## Honeycomb API
+Scripts are available under the `./scripts/` directory for operational tasks:
 
-These examples demonstrate how to interact with the Honeycomb API.
+### 📎 Manage Annotations
 
-### List All Triggers
+* **Storefront Annotations:**
 
-Retrieve all triggers for the frontend proxy:
+  ```bash
+  ./scripts/manage-storefront-annotations.sh <add|remove> <Suffix> <Team ID> <Namespace>
+  ```
 
-```bash
-curl -s -X GET https://api.honeycomb.io/1/triggers/frontendproxy \
-  -H "X-Honeycomb-Team: $TF_VAR_honeycomb_storefront_api_key" | jq .
-```
+* **WordPress Annotations:**
 
-### Get All SLOs
+  ```bash
+  ./scripts/manage-wordpress-annotations.sh <add|remove> <Suffix> <Team ID> <Namespace>
+  ```
 
-Retrieve all Service Level Objectives (SLOs) for the frontend proxy:
+### 🔬 Run Reliability Tests
 
-```bash
-curl -s -X GET https://api.honeycomb.io/1/slos/frontendproxy \
-  -H "X-Honeycomb-Team: $TF_VAR_honeycomb_storefront_api_key" | jq .
-```
+* Run tests for services in a given team:
 
-### Markers
+  ```bash
+  ./scripts/test-services.sh <Team ID>
+  ```
 
-To create markers, use the following details:
+### 🛠 Other Utilities
 
-- **Request URL:**  
-  `https://api.honeycomb.io/1/markers/__all__`
+* `run-scenario.sh`: Execute saved Gremlin scenarios
+* `retrieve-services-scores.sh`: Fetch service health scores
+* `evaluate-service-health.sh`: Evaluate cluster and service health
+* `run-failure-flag-experiments.sh`: Test Failure Flags integration
 
- > **Note:** The dataset slug or use `__all__` for endpoints that support environment-wide operations.
+## 📊 Observability Integrations
 
-- **Custom Headers:**  
-  - **Key:** `X-Honeycomb-Team`  
-  - **Value:** `<Honeycomb API Key>`
+### 🐝 Honeycomb
 
-- **Payload Example:**
+Interact with the Honeycomb API:
+
+* **List Triggers:**
+
+  ```bash
+  curl -s -X GET https://api.honeycomb.io/1/triggers/frontendproxy \
+    -H "X-Honeycomb-Team: $TF_VAR_honeycomb_storefront_api_key" | jq .
+  ```
+
+* **Get SLOs:**
+
+  ```bash
+  curl -s -X GET https://api.honeycomb.io/1/slos/frontendproxy \
+    -H "X-Honeycomb-Team: $TF_VAR_honeycomb_storefront_api_key" | jq .
+  ```
+
+* **Send Marker Example:**
 
   ```json
   {
@@ -80,10 +94,28 @@ To create markers, use the following details:
   }
   ```
 
-### Dynatrace
+### 📡 Dynatrace
 
-Get Dynatrace Synthetic Monitor Locations
+* Get synthetic monitor locations filtered by name and platform:
+
+  ```bash
+  curl -X GET -s -H "Authorization: Api-Token $TF_VAR_dnyatrace_api_token" \
+    https://qpm46186.live.dynatrace.com/api/v1/synthetic/locations | \
+    jq '.locations[] | select(.name=="Dublin" and .cloudPlatform=="AMAZON_EC2")'
+  ```
+
+## 📁 Directory Structure
 
 ```
-curl -X GET -s -H "Authorization: Api-Token $TF_VAR_dnyatrace_api_token" https://qpm46186.live.dynatrace.com/api/v1/synthetic/locations | jq '.locations[] | select(.name=="Dublin" and .cloudPlatform=="AMAZON_EC2")'
+aws-us-east-1/         # AWS infrastructure and Helm values
+azure-northeurope/     # Azure infrastructure with VNet modules
+gke-us-east1/          # GCP infrastructure for GKE clusters
+scripts/               # Utility and automation scripts
+manifests/             # Kubernetes manifests for demo apps
+docs/                  # Documentation (e.g., Cloud Foundry on AWS)
 ```
+
+## 📄 License
+
+This project is licensed under the terms of the [MIT License](./LICENSE).
+
