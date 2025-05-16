@@ -1,0 +1,6 @@
+helm upgrade --install \
+  cert-manager cert-manager/cert-manager \
+  --namespace cert-manager \
+  --create-namespace \
+  --version 1.17.2 --set global.leaderElection.namespace=cert-manager \
+  --set crds.enabled=true

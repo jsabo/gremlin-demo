@@ -9,24 +9,22 @@ resource "google_container_cluster" "primary" {
   subnetwork = google_compute_subnetwork.primary.id
 
   ip_allocation_policy {
-    cluster_ipv4_cidr_block = local.cluster_service_ipv4_cidr
+    cluster_ipv4_cidr_block = var.cluster_service_ipv4_cidr
   }
 
   deletion_protection = false
 }
 
 resource "google_container_node_pool" "primary_nodes" {
-  name     = "primary-node-pool"
   cluster  = google_container_cluster.primary.id
   location = local.region
+  name     = "primary-node-pool"
 
   node_config {
-    machine_type = local.instance_type
+    machine_type = var.instance_type
     disk_size_gb = 100
     disk_type    = "pd-balanced"
-
     oauth_scopes = ["https://www.googleapis.com/auth/cloud-platform"]
-    tags         = ["gke-node", local.name]
     labels       = local.sanitized_labels
   }
 
@@ -43,27 +41,58 @@ resource "google_container_node_pool" "primary_nodes" {
   }
 }
 
-resource "google_container_node_pool" "scylla_nodes" {
-  name     = "scylla-cluster-pool"
+resource "google_container_node_pool" "rabbitmq_pool" {
   cluster  = google_container_cluster.primary.id
   location = local.region
+  name     = "rabbitmq-pool"
 
   node_config {
-    machine_type    = "n2-standard-4"
-    disk_size_gb    = 100
-    disk_type       = "pd-ssd"
-    image_type      = "UBUNTU_CONTAINERD"
-    local_ssd_count = 0 # Optional Local NVMe SSDs for ScyllaDB
-    oauth_scopes    = ["https://www.googleapis.com/auth/cloud-platform"]
-    tags            = ["gke-node", local.name, "scylla"]
+    machine_type = "n2-standard-4"
+    disk_size_gb = 100
+    disk_type    = "pd-ssd"
+    oauth_scopes = ["https://www.googleapis.com/auth/cloud-platform"]
+    tags         = ["rabbitmq"]
+    labels = {
+      "rabbitmq.com/node-type" = "rabbitmq"
+    }
+    taint {
+      key    = "rabbitmq.com/node-type"
+      value  = "rabbitmq"
+      effect = "NO_SCHEDULE"
+    }
+  }
+
+  initial_node_count = 1
+
+  autoscaling {
+    min_node_count = 1
+    max_node_count = 3
+  }
+
+  management {
+    auto_repair  = true
+    auto_upgrade = true
+  }
+}
+
+resource "google_container_node_pool" "scylla_nodes" {
+  cluster  = google_container_cluster.primary.id
+  location = local.region
+  name     = "scylla-cluster-pool"
+
+  node_config {
+    machine_type = "n2-standard-4"
+    disk_size_gb = 100
+    disk_type    = "pd-ssd"
+    image_type   = "UBUNTU_CONTAINERD"
+    oauth_scopes = ["https://www.googleapis.com/auth/cloud-platform"]
+    tags         = ["scylla"]
     labels = {
       "scylla.scylladb.com/node-type" = "scylla"
     }
-
     kubelet_config {
       cpu_manager_policy = "static"
     }
-
     taint {
       key    = "scylla-operator.scylladb.com/dedicated"
       value  = "scyllaclusters"
@@ -84,39 +113,3 @@ resource "google_container_node_pool" "scylla_nodes" {
   }
 }
 
-
-resource "google_container_node_pool" "rabbitmq_pool" {
-  name     = "rabbitmq-pool"
-  cluster  = google_container_cluster.primary.id
-  location = local.region
-
-  node_config {
-    machine_type = "n2-standard-4"
-    disk_size_gb = 100
-    disk_type    = "pd-ssd"
-    local_ssd_count = 0 
-    oauth_scopes = ["https://www.googleapis.com/auth/cloud-platform"]
-    tags         = ["gke-node", local.name, "rabbitmq"]
-    labels = {
-      "rabbitmq.com/node-type" = "rabbitmq"
-    }
-
-    taint {
-      key    = "rabbitmq.com/node-type"
-      value  = "rabbitmq"
-      effect = "NO_SCHEDULE"
-    }
-  }
-
-  initial_node_count = 1
-
-  autoscaling {
-    min_node_count = 1
-    max_node_count = 3
-  }
-
-  management {
-    auto_repair  = true
-    auto_upgrade = true
-  }
-}

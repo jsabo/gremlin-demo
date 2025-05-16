@@ -1,7 +1,7 @@
-# Variables
 variable "project" {
   description = "GCP Project ID"
   type        = string
+  default     = "gremlin-support"
 }
 
 variable "name" {
@@ -23,25 +23,19 @@ variable "vpc_cidr" {
 }
 
 variable "cluster_service_ipv4_cidr" {
-  description = "GKE Cluster CIDR"
+  description = "GKE cluster secondary CIDR"
   type        = string
   default     = "10.2.0.0/16"
 }
 
-variable "desired_size" {
-  description = "Number of nodes in the primary cluster node pool"
-  type        = number
-  default     = 1
-}
-
 variable "instance_type" {
-  description = "Machine type for GKE nodes"
+  description = "Machine type for primary GKE nodes"
   type        = string
   default     = "e2-standard-2"
 }
 
 variable "tags" {
-  description = "Tags to apply to resources"
+  description = "Labels to apply to GKE nodes"
   type        = map(string)
   default = {
     Environment = "dev"
