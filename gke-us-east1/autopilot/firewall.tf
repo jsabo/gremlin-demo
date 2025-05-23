@@ -13,6 +13,7 @@ resource "google_compute_firewall" "scylla" {
       "9180",  # Prometheus
       "9100",  # node_exporter (optional)
       "10000", # REST API
+      "10001", # Scylla Manager Agent REST API (HTTPS)
       "19042", # Shard-aware CQL
       "19142"  # Shard-aware CQL (SSL)
     ]
