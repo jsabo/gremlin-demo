@@ -14,10 +14,6 @@ resource "google_container_cluster" "primary" {
 
   deletion_protection = false
 
-  network_policy {
-    enabled  = true
-    provider = "CALICO"
-  }
 }
 
 resource "google_container_node_pool" "primary_nodes" {

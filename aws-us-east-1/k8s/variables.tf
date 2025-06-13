@@ -25,7 +25,7 @@ variable "gremlin_team_secret" {
 variable "gremlin_chart_version" {
   description = "Gremlin Helm Chart release version"
   type        = string
-  default     = "0.20.2"
+  default     = "0.23.0"
 }
 
 variable "otel_demo_chart_version" {
